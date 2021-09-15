@@ -1,6 +1,9 @@
 package net.xdclass.controller;
 
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import net.xdclass.model.AddressDO;
 import net.xdclass.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 二当家小D
  * @since 2021-09-13
  */
+@Api(tags = "收货地址模块")
 @RestController
 @RequestMapping("/api/address/v1/")
 public class AddressController {
@@ -25,8 +29,9 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
+    @ApiOperation("根据Id查找地址详情")
     @GetMapping("find/{address_id}")
-    public Object detail(@PathVariable("address_id") Long addressId){
+    public Object detail(@ApiParam(value = "地址id",required = true) @PathVariable("address_id") Long addressId){
         return addressService.detail(addressId);
     }
 
