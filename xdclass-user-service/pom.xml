@@ -12,12 +12,18 @@
     <artifactId>xdclass-user-service</artifactId>
 
     <dependencies>
-    <dependency>
-        <groupId>net.xdclass</groupId>
-        <artifactId>xdclass-common</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </dependency>
-</dependencies>
+        <dependency>
+            <groupId>net.xdclass</groupId>
+            <artifactId>xdclass-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+    </dependencies>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
