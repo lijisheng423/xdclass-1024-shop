@@ -11,6 +11,10 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/xdclass_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
     password: Abcd1234
+  redis:
+    host: 39.105.31.194
+    password: 123456
+    port: 8000
 
 #配置plus打印sql日志
 mybatis-plus:
