@@ -9,6 +9,7 @@ import java.util.Random;
 public class CommonUtil {
     /**
      * 获取ip
+     *
      * @param request
      * @return
      */
@@ -44,7 +45,7 @@ public class CommonUtil {
                 }
             }
         } catch (Exception e) {
-            ipAddress="";
+            ipAddress = "";
         }
         return ipAddress;
     }
@@ -52,10 +53,11 @@ public class CommonUtil {
 
     /**
      * MD5加密
+     *
      * @param data
      * @return
      */
-    public static String MD5(String data)  {
+    public static String MD5(String data) {
         try {
             java.security.MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(data.getBytes("UTF-8"));
@@ -73,16 +75,26 @@ public class CommonUtil {
 
     /**
      * 获取验证码随机数
+     *
      * @param length
      * @return
      */
-    public static String getRandomCode(int length){
+    public static String getRandomCode(int length) {
         String sources = "0123456789";
         Random random = new Random();
         StringBuffer sb = new StringBuffer();
-        for (int j=0;j<length;j++){
+        for (int j = 0; j < length; j++) {
             sb.append(sources.charAt(random.nextInt(9)));
         }
         return sb.toString();
+    }
+
+    /**
+     * 获取当前时间戳
+     *
+     * @return
+     */
+    public static long getCurrentTimestamp() {
+        return System.currentTimeMillis();
     }
 }
