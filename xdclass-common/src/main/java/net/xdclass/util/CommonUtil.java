@@ -108,5 +108,24 @@ public class CommonUtil {
         return UUID.randomUUID().toString().replaceAll("-", "").substring(0, 32);
     }
 
+    /**
+     * 生成指定长度随机字母和数字
+     *
+     * @param length
+     * @return
+     */
+    private static final String ALL_CHAR_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    public static String getStringNumRandom(int length) {
+        //生成随机数字和字母
+        Random random = new Random();
+        StringBuilder saleString = new StringBuilder(length);
+        for (int i = 0; i <= length; i++) {
+            saleString.append(ALL_CHAR_NUM.charAt(random.nextInt(ALL_CHAR_NUM.length())));
+        }
+        return saleString.toString();
+
+    }
+
 
 }

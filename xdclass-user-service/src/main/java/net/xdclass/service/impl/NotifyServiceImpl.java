@@ -31,7 +31,7 @@ public class NotifyServiceImpl implements NotifyService {
     private static final String SUBJECT = "小滴课堂验证码";
 
     //验证码的内容
-    private static final String CONTENT = "您的验证码是%s，有效时间是60s,请不要告诉任何人。";
+    private static final String CONTENT = "您的验证码是%s，有效时间是10min,请不要告诉任何人。";
 
     /**
      * 10分钟有效
