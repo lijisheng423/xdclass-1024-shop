@@ -1,5 +1,6 @@
 package net.xdclass.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.SendCodeEnum;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -63,7 +65,7 @@ public class UserServiceImpl implements UserService {
         String cryptPwd = Md5Crypt.md5Crypt(registerRequest.getPwd().getBytes(), userDO.getSecret());
         userDO.setPwd(cryptPwd);
 
-        //账号唯一性检查 TODO
+        //账号唯一性检查
         if (checkUnique(userDO.getMail())) {
             int rows = userMapper.insert(userDO);
             log.info("rows:{},注册成功:{}", rows, userDO.toString());
@@ -83,7 +85,9 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     private boolean checkUnique(String mail) {
-        return true;
+        QueryWrapper queryWrapper = new QueryWrapper<UserDO>().eq("mail", mail);
+        List<UserDO> list = userMapper.selectList(queryWrapper);
+        return list.size() > 0 ? false : true;
     }
 
     /**
