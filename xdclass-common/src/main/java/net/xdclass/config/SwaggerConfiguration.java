@@ -72,7 +72,6 @@ public class SwaggerConfiguration {
         parameters.add(new RequestParameterBuilder()
         .name("version")
         .description("版本号")
-        .required(true)
         .in(ParameterType.HEADER)
         .query(q->q.model(m->m.scalarModel(ScalarType.STRING)))
         .required(false)
