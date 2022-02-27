@@ -33,6 +33,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * 用户上传头像
+     * 默认最大是1M，否则会报错
+     * @param file
+     * @return
+     */
     @ApiOperation("用户头像上传")
     @PostMapping(value = "upload")
     public JsonData uploadUserImg(
