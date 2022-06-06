@@ -148,7 +148,7 @@ public class CommonUtil {
             writer.print(objectMapper.writeValueAsString(obj));
             response.flushBuffer();
         } catch (IOException e) {
-            log.warn("相应json数据给前端异常:{}",e);
+            log.warn("相应json数据给前端异常:{}", e);
         }
     }
 
