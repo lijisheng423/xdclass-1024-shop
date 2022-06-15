@@ -4,11 +4,13 @@ package net.xdclass.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.exception.BizException;
 import net.xdclass.model.AddressDO;
 import net.xdclass.request.AddressAddRequest;
 import net.xdclass.service.AddressService;
 import net.xdclass.util.JsonData;
+import net.xdclass.vo.AddressVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +30,12 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
+    /**
+     * 新增收获地址
+     *
+     * @param addressAddRequest
+     * @return
+     */
     @ApiOperation("新增收获地址")
     @PostMapping("add")
     public JsonData add(@ApiParam("地址对象") @RequestBody AddressAddRequest addressAddRequest) {
@@ -35,18 +43,32 @@ public class AddressController {
         return JsonData.buildSuccess();
     }
 
+    /**
+     * 根据Id查找地址详情
+     *
+     * @param addressId
+     * @return
+     */
     @ApiOperation("根据Id查找地址详情")
     @GetMapping("find/{address_id}")
     public Object detail(@ApiParam(value = "地址id", required = true) @PathVariable("address_id") Long addressId) {
-        AddressDO addressDO = addressService.detail(addressId);
+        AddressVO addressVO = addressService.detail(addressId);
 
-        //int i = 1/0;
+        return addressVO == null ? JsonData.buildResult(BizCodeEnum.ADDRESS_NO_EXITS) : JsonData.buildSuccess(addressVO);
+    }
 
-        /*if (addressId==1){
-            throw new BizException(-1,"测试业务异常");
-        }*/
 
-        return JsonData.buildSuccess(addressDO);
+    /**
+     * 删除指定收货地址
+     *
+     * @param addressId
+     * @return
+     */
+    @ApiOperation("删除收货地址")
+    @DeleteMapping("del/{address_id}")
+    public JsonData del(@ApiParam(value = "地址id", required = true) @PathVariable("address_id") Long addressId) {
+        int rows = addressService.del(addressId);
+        return rows == 1 ? JsonData.buildSuccess() : JsonData.buildResult(BizCodeEnum.ADDRESS_DEL_FAIL);
     }
 
 

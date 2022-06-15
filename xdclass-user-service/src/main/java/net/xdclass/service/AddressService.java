@@ -2,6 +2,7 @@ package net.xdclass.service;
 
 import net.xdclass.model.AddressDO;
 import net.xdclass.request.AddressAddRequest;
+import net.xdclass.vo.AddressVO;
 
 public interface AddressService {
 
@@ -11,7 +12,7 @@ public interface AddressService {
      * @param id
      * @return
      */
-    AddressDO detail(Long id);
+    AddressVO detail(Long id);
 
     /**
      * 新增收货地址
@@ -20,4 +21,6 @@ public interface AddressService {
      * @return
      */
     void add(AddressAddRequest addressAddRequest);
+
+    int del(Long addressId);
 }

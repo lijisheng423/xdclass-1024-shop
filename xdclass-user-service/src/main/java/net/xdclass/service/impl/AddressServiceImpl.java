@@ -9,10 +9,12 @@ import net.xdclass.model.AddressDO;
 import net.xdclass.model.LoginUser;
 import net.xdclass.request.AddressAddRequest;
 import net.xdclass.service.AddressService;
+import net.xdclass.vo.AddressVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.mail.Address;
 import java.util.Date;
 
 @Service
@@ -23,9 +25,14 @@ public class AddressServiceImpl implements AddressService {
     private AddressMapper addressMapper;
 
     @Override
-    public AddressDO detail(Long id) {
+    public AddressVO detail(Long id) {
         AddressDO addressDO = addressMapper.selectOne(new QueryWrapper<AddressDO>().eq("id", id));
-        return addressDO;
+        if (addressDO == null) {
+            return null;
+        }
+        AddressVO addressVO = new AddressVO();
+        BeanUtils.copyProperties(addressDO, addressVO);
+        return addressVO;
     }
 
     /**
@@ -59,5 +66,17 @@ public class AddressServiceImpl implements AddressService {
         int rows = addressMapper.insert(addressDO);
 
         log.info("新增收货地址:rows={},data={}", rows, addressDO);
+    }
+
+    /**
+     * 根据id删除地址
+     *
+     * @param addressId
+     * @return
+     */
+    @Override
+    public int del(Long addressId) {
+        int rows = addressMapper.delete(new QueryWrapper<AddressDO>().eq("id", addressId));
+        return rows;
     }
 }
