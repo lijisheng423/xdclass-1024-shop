@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.Address;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -78,5 +80,22 @@ public class AddressServiceImpl implements AddressService {
     public int del(Long addressId) {
         int rows = addressMapper.delete(new QueryWrapper<AddressDO>().eq("id", addressId));
         return rows;
+    }
+
+    /**
+     * 查找用户全部收货地址
+     *
+     * @return
+     */
+    @Override
+    public List<AddressVO> listUserAllAddress() {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        List<AddressDO> list = addressMapper.selectList(new QueryWrapper<AddressDO>().eq("user_id", loginUser.getId()));
+        List<AddressVO> addressVOList = list.stream().map(obj -> {
+            AddressVO addressVO = new AddressVO();
+            BeanUtils.copyProperties(obj, addressVO);
+            return addressVO;
+        }).collect(Collectors.toList());
+        return addressVOList;
     }
 }

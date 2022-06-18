@@ -14,6 +14,8 @@ import net.xdclass.vo.AddressVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * <p>
  * 电商-公司收发货地址表 前端控制器
@@ -69,6 +71,19 @@ public class AddressController {
     public JsonData del(@ApiParam(value = "地址id", required = true) @PathVariable("address_id") Long addressId) {
         int rows = addressService.del(addressId);
         return rows == 1 ? JsonData.buildSuccess() : JsonData.buildResult(BizCodeEnum.ADDRESS_DEL_FAIL);
+    }
+
+
+    /**
+     * 查询用户的全部收货地址
+     *
+     * @return
+     */
+    @ApiOperation("查询用户的全部收货地址")
+    @GetMapping("list")
+    public JsonData findUserAllAddress() {
+        List<AddressVO> list = addressService.listUserAllAddress();
+        return JsonData.buildSuccess(list);
     }
 
 

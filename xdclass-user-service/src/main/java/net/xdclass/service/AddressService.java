@@ -4,6 +4,8 @@ import net.xdclass.model.AddressDO;
 import net.xdclass.request.AddressAddRequest;
 import net.xdclass.vo.AddressVO;
 
+import java.util.List;
+
 public interface AddressService {
 
     /**
@@ -23,4 +25,11 @@ public interface AddressService {
     void add(AddressAddRequest addressAddRequest);
 
     int del(Long addressId);
+
+    /**
+     * 查找用户全部收货地址
+     *
+     * @return
+     */
+    List<AddressVO> listUserAllAddress();
 }
