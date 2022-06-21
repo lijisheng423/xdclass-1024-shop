@@ -29,6 +29,13 @@
             <version>8.0.25</version>
         </dependency>
 
+        <!--mybatis plus-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+
         <!-- 代码自动生成依赖 begin 上线后不需要，只在common中添加 -->
         <dependency>
             <groupId>com.baomidou</groupId>
