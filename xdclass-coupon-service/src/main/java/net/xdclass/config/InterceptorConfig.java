@@ -22,6 +22,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 //拦截的路径
                 .addPathPatterns("/api/coupon/*/**","/api/coupon_record/*/**")
                 //排除不拦截的路径
-                .excludePathPatterns("/api/coupon/*/page_coupon");
+                .excludePathPatterns("/api/coupon/*/page_coupon","/api/coupon/*/new_user_coupon");
     }
 }

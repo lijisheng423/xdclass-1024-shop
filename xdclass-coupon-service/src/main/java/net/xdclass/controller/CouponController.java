@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.enums.CouponCategoryEnum;
+import net.xdclass.request.NewUserRequest;
 import net.xdclass.service.CouponService;
 import net.xdclass.util.JsonData;
 import org.redisson.api.RLock;
@@ -49,6 +50,18 @@ public class CouponController {
     public JsonData addPromotionCoupon(@ApiParam(value = "优惠券ID",required = true) @PathVariable("coupon_id") long couponId){
         JsonData jsonData = couponService.addCoupon(couponId, CouponCategoryEnum.PROMOTION);
         return JsonData.buildSuccess();
+    }
+
+
+    /**
+     * 新用户注册发放优惠券接口
+     * @return
+     */
+    @ApiOperation("RPC-新用户注册接口")
+    @PostMapping("/new_user_coupon")
+    public JsonData addNewUserCoupon(@ApiParam("用户对象") @RequestBody NewUserRequest newUserRequest){
+        JsonData jsonData = couponService.initNewUserCoupon(newUserRequest);
+        return JsonData.buildSuccess(jsonData);
     }
 }
 
