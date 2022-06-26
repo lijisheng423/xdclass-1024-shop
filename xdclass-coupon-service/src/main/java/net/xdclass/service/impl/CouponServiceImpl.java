@@ -45,9 +45,6 @@ public class CouponServiceImpl implements CouponService {
     private CouponRecordMapper couponRecordMapper;
 
     @Autowired
-    private RedisTemplate redisTemplate;
-
-    @Autowired
     private RedissonClient redissonClient;
 
     @Override
