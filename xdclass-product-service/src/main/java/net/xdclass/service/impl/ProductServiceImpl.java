@@ -41,6 +41,17 @@ public class ProductServiceImpl implements ProductService {
         return pageMap;
     }
 
+    /**
+     * 根据id查询商品详情
+     * @param productId
+     * @return
+     */
+    @Override
+    public ProductVO findDetailById(long productId) {
+        ProductDO productDO = productMapper.selectOne(new QueryWrapper<ProductDO>().eq("id", productId));
+        return beanProcess(productDO);
+    }
+
     private ProductVO beanProcess(ProductDO productDO) {
         ProductVO productVO = new ProductVO();
         BeanUtils.copyProperties(productDO,productVO);
