@@ -7,10 +7,7 @@ import net.xdclass.request.CartItemRequest;
 import net.xdclass.service.CartService;
 import net.xdclass.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "购物车")
 @RestController
@@ -26,6 +23,15 @@ public class CartController {
     public JsonData addToCart(@ApiParam("购物项") @RequestBody CartItemRequest cartItemRequest){
         cartService.addToCart(cartItemRequest);
         return JsonData.buildSuccess();
+    }
+
+
+    @ApiOperation("清空购物车")
+    @DeleteMapping("clear")
+    public JsonData clearMyCart(){
+        cartService.clear();
+        return JsonData.buildSuccess();
+
     }
 
 
