@@ -1,5 +1,7 @@
 package net.xdclass.service;
 
+import net.xdclass.vo.CouponRecordVO;
+
 import java.util.Map;
 
 public interface CouponRecordService {
@@ -11,4 +13,11 @@ public interface CouponRecordService {
      * @return
      */
     Map<String,Object> page(int page, int size);
+
+    /**
+     * 根据id查询优惠券详情
+     * @param recordId
+     * @return
+     */
+    CouponRecordVO findById(long recordId);
 }
