@@ -20,7 +20,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor())
                 //拦截的路径
-                .addPathPatterns("")
+                .addPathPatterns("/api/cart/*/**")
                 //排除不拦截的路径
                 .excludePathPatterns("");
     }

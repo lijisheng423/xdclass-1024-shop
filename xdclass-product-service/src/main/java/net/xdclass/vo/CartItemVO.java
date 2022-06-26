@@ -65,4 +65,28 @@ public class CartItemVO {
     public BigDecimal getTotalAmount() {
         return this.amount.multiply(new BigDecimal(this.buyNum));
     }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public void setBuyNum(Integer buyNum) {
+        this.buyNum = buyNum;
+    }
+
+    public void setProductTitle(String productTitle) {
+        this.productTitle = productTitle;
+    }
+
+    public void setProductImg(String productImg) {
+        this.productImg = productImg;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 }
