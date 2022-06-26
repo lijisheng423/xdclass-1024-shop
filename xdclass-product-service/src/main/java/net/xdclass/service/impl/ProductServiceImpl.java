@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,20 @@ public class ProductServiceImpl implements ProductService {
     public ProductVO findDetailById(long productId) {
         ProductDO productDO = productMapper.selectOne(new QueryWrapper<ProductDO>().eq("id", productId));
         return beanProcess(productDO);
+    }
+
+    /**
+     * 批量查询商品最新价格
+     * @param productIdList
+     * @return
+     */
+    @Override
+    public List<ProductVO> findProductsByIdBatch(List<Long> productIdList) {
+
+        List<ProductDO> productDOList = productMapper.selectList(new QueryWrapper<ProductDO>()
+                .in("id", productIdList));
+        List<ProductVO> productVOList = productDOList.stream().map(obj -> beanProcess(obj)).collect(Collectors.toList());
+        return productVOList;
     }
 
     private ProductVO beanProcess(ProductDO productDO) {

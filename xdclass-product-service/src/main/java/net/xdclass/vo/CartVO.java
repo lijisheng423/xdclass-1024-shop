@@ -80,4 +80,20 @@ public class CartVO {
         }
         return amount;
     }
+
+    public void setCartItems(List<CartItemVO> cartItems) {
+        this.cartItems = cartItems;
+    }
+
+    public void setTotalNum(Integer totalNum) {
+        this.totalNum = totalNum;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setRealPayAmount(BigDecimal realPayAmount) {
+        this.realPayAmount = realPayAmount;
+    }
 }

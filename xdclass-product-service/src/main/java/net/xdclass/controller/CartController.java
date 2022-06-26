@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import net.xdclass.request.CartItemRequest;
 import net.xdclass.service.CartService;
 import net.xdclass.util.JsonData;
+import net.xdclass.vo.CartVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,14 @@ public class CartController {
     public JsonData clearMyCart(){
         cartService.clear();
         return JsonData.buildSuccess();
+    }
+
+
+    @ApiOperation("查看我的购物车")
+    @GetMapping("mycart")
+    public JsonData findMyCart(){
+        CartVO cartVO = cartService.getMyCart();
+        return JsonData.buildSuccess(cartVO);
 
     }
 
