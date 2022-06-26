@@ -5,6 +5,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+/**
+ * hibernate validate 自定义校验
+ */
+
 @ApiModel
 @Data
 public class CartItemRequest {

@@ -100,6 +100,38 @@ public class CartServiceImpl implements CartService {
         return cartVO;
     }
 
+    /**
+     * 删除购物项
+     * @param productId
+     */
+    @Override
+    public void deleteItem(long productId) {
+
+        BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
+
+        myCart.delete(productId);
+
+    }
+
+    /**
+     * 修改购物车商品数量
+     * @param cartItemRequest
+     */
+    @Override
+    public void changeItemNum(CartItemRequest cartItemRequest) {
+
+        BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
+
+        Object obj = myCart.get(cartItemRequest.getProductId());
+        if (obj==null){
+            throw new BizException(BizCodeEnum.CART_FAIL);
+        }
+        CartItemVO cartItemVO = JSON.parseObject((String) obj, CartItemVO.class);
+        cartItemVO.setBuyNum(cartItemRequest.getBuyNum());
+        myCart.put(cartItemRequest.getProductId(),JSON.toJSONString(cartItemVO));
+
+    }
+
 
     /**
      * 获取最新的购物项
