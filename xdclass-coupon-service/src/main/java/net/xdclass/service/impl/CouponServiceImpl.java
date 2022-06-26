@@ -77,8 +77,11 @@ public class CouponServiceImpl implements CouponService {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String lockKey = "lock:coupon:" + couponId;
         RLock rLock = redissonClient.getLock(lockKey);
-        //多个线程进入会阻塞等待释放锁
+        //多个线程进入会阻塞等待释放锁，默认30s，有watch dog自动续期
         rLock.lock();
+        //加锁10s之后过期，没有watch dog功能
+        //rLock.lock(10,TimeUnit.SECONDS);
+
         log.info("领券接口加锁成功:{}"+Thread.currentThread().getId());
         try {
             CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
