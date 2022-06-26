@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -72,6 +74,7 @@ public class CouponServiceImpl implements CouponService {
      * @param categoryEnum
      * @return
      */
+    @Transactional(rollbackFor=Exception.class,propagation= Propagation.REQUIRED)
     @Override
     public JsonData addCoupon(long couponId, CouponCategoryEnum categoryEnum) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
@@ -83,6 +86,11 @@ public class CouponServiceImpl implements CouponService {
         //rLock.lock(10,TimeUnit.SECONDS);
 
         log.info("领券接口加锁成功:{}"+Thread.currentThread().getId());
+        /*try {
+            TimeUnit.SECONDS.sleep(90);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
         try {
             CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
                     .eq("id", couponId)
@@ -105,6 +113,9 @@ public class CouponServiceImpl implements CouponService {
 
             //扣减库存
             int rows = couponMapper.reduceStock(couponId);
+
+            //int flag = 1/0;
+
             if (rows == 1) {
                 //扣减库存成功才保存记录
                 couponRecordMapper.insert(couponRecordDO);
