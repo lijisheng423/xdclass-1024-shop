@@ -1,7 +1,7 @@
 package net.xdclass.service;
 
 import net.xdclass.enums.CouponCategoryEnum;
-import net.xdclass.request.NewUserRequest;
+import net.xdclass.request.NewUserCouponRequest;
 import net.xdclass.util.JsonData;
 
 import java.util.Map;
@@ -25,8 +25,8 @@ public interface CouponService {
 
     /**
      * 新用户注册发送优惠券
-     * @param newUserRequest
+     * @param newUserCouponRequest
      * @return
      */
-    JsonData initNewUserCoupon(NewUserRequest newUserRequest);
+    JsonData initNewUserCoupon(NewUserCouponRequest newUserCouponRequest);
 }

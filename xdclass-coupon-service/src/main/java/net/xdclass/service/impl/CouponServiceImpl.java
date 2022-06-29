@@ -14,7 +14,7 @@ import net.xdclass.mapper.CouponRecordMapper;
 import net.xdclass.model.CouponDO;
 import net.xdclass.model.CouponRecordDO;
 import net.xdclass.model.LoginUser;
-import net.xdclass.request.NewUserRequest;
+import net.xdclass.request.NewUserCouponRequest;
 import net.xdclass.service.CouponService;
 import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JsonData;
@@ -23,15 +23,11 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -132,15 +128,15 @@ public class CouponServiceImpl implements CouponService {
      * 新用户注册发送优惠券
      * 用户微服务调用的时候没传递token,因为没登录
      * 本地直接调用发放优惠券的方法，需要构造一个登录用户，存储在threadLocal
-     * @param newUserRequest
+     * @param newUserCouponRequest
      * @return
      */
     @Override
     @Transactional(rollbackFor=Exception.class,propagation= Propagation.REQUIRED)
-    public JsonData initNewUserCoupon(NewUserRequest newUserRequest) {
+    public JsonData initNewUserCoupon(NewUserCouponRequest newUserCouponRequest) {
         LoginUser loginUser = new LoginUser();
-        loginUser.setId(newUserRequest.getUserId());
-        loginUser.setName(newUserRequest.getName());
+        loginUser.setId(newUserCouponRequest.getUserId());
+        loginUser.setName(newUserCouponRequest.getName());
         LoginInterceptor.threadLocal.set(loginUser);
 
         //查询新用户有哪些优惠券

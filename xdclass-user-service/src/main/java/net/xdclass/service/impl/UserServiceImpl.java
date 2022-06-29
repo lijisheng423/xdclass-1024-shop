@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.SendCodeEnum;
+import net.xdclass.fegin.CouponFeginService;
 import net.xdclass.interceptor.LoginInterceptor;
 import net.xdclass.mapper.UserMapper;
 import net.xdclass.model.LoginUser;
@@ -15,6 +16,7 @@ import net.xdclass.service.UserService;
 import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JWTUtil;
 import net.xdclass.util.JsonData;
+import net.xdclass.vo.NewUserCouponRequest;
 import net.xdclass.vo.UserVO;
 import org.apache.catalina.User;
 import org.apache.commons.codec.digest.Md5Crypt;
@@ -32,6 +34,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private NotifyService notifyService;
+
+    @Autowired
+    private CouponFeginService couponFeginService;
 
     @Autowired
     private UserMapper userMapper;
@@ -141,6 +146,10 @@ public class UserServiceImpl implements UserService {
      * @param userDO
      */
     private void userRegisterInitTask(UserDO userDO) {
-
+        NewUserCouponRequest newUserCouponRequest = new NewUserCouponRequest();
+        newUserCouponRequest.setName(userDO.getName());
+        newUserCouponRequest.setUserId(userDO.getId());
+        JsonData jsonData = couponFeginService.addNewUserCoupon(newUserCouponRequest);
+        log.info("发放新用户注册优惠券:{},结果:{}",newUserCouponRequest,jsonData.toString());
     }
 }
