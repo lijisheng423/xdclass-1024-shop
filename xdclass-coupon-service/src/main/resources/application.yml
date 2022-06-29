@@ -5,6 +5,12 @@ spring:
   application:
     name: xdclass-coupon-service
 
+  cloud:
+    #注册中心地址
+    nacos:
+      discovery:
+        server-addr: 39.105.31.194:8848
+
   #数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
