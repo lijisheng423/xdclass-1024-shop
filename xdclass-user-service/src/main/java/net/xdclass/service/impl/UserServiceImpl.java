@@ -1,6 +1,7 @@
 package net.xdclass.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.SendCodeEnum;
@@ -24,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -53,6 +56,8 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    //@Transactional(rollbackFor=Exception.class,propagation= Propagation.REQUIRED)
+    @GlobalTransactional
     public JsonData register(UserRegisterRequest registerRequest) {
 
         //邮箱验证码验证
@@ -83,6 +88,9 @@ public class UserServiceImpl implements UserService {
 
             //新用户注册成功，初始化信息，发放福利等 TODO
             userRegisterInitTask(userDO);
+
+            //模拟异常
+            //int b = 1/0;
             return JsonData.buildSuccess();
         } else {
             return JsonData.buildResult(BizCodeEnum.ACCOUNT_REPEAT);
