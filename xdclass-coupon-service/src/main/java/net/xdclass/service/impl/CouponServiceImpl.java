@@ -146,6 +146,7 @@ public class CouponServiceImpl implements CouponService {
             //幂等操作，调用需要加锁
             addCoupon(couponDO.getId(),CouponCategoryEnum.NEW_USER);
         }
+        //int b = 1/0;
         return JsonData.buildSuccess();
     }
 

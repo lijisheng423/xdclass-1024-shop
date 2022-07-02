@@ -158,6 +158,9 @@ public class UserServiceImpl implements UserService {
         newUserCouponRequest.setName(userDO.getName());
         newUserCouponRequest.setUserId(userDO.getId());
         JsonData jsonData = couponFeginService.addNewUserCoupon(newUserCouponRequest);
+        if (jsonData.getCode()!=0){
+            throw new RuntimeException("发放优惠券异常");
+        }
         log.info("发放新用户注册优惠券:{},结果:{}",newUserCouponRequest,jsonData.toString());
     }
 }
