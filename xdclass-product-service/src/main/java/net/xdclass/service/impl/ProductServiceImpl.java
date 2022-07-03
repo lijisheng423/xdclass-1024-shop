@@ -3,18 +3,21 @@ package net.xdclass.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import net.xdclass.config.RabbitMQConfig;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.StockTaskStateEnum;
 import net.xdclass.exception.BizException;
 import net.xdclass.mapper.ProductMapper;
 import net.xdclass.mapper.ProductTaskMapper;
 import net.xdclass.model.ProductDO;
+import net.xdclass.model.ProductMessage;
 import net.xdclass.model.ProductTaskDO;
 import net.xdclass.request.LockProductRequest;
 import net.xdclass.request.OrderItemRequest;
 import net.xdclass.service.ProductService;
 import net.xdclass.util.JsonData;
 import net.xdclass.vo.ProductVO;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductTaskMapper productTaskMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
     /**
      * 分页查询商品列表
@@ -114,8 +123,15 @@ public class ProductServiceImpl implements ProductService {
                 productTaskDO.setProductName(productVO.getTitle());
                 productTaskDO.setOutTradeNo(orderOutTradeNo);
                 productTaskMapper.insert(productTaskDO);
+                log.info("商品库存锁定-插入商品product_task成功:{}",productTaskDO);
 
-                //发送MQ延迟消息，解锁商品库存 todo
+                //发送MQ延迟消息，解锁商品库存
+                ProductMessage productMessage = new ProductMessage();
+                productMessage.setOutTradeNo(orderOutTradeNo);
+                productMessage.setTaskId(productTaskDO.getId());
+
+                rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(),rabbitMQConfig.getStockReleaseDelayRoutingKey(),productMessage);
+                log.info("商品库存锁定延迟消息发送成功:{}",productMessage);
             }
         }
 
