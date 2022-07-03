@@ -47,9 +47,9 @@ public class MyBatisPlusGenerator {
         dsConfig.setDbType(DbType.MYSQL)
                 .setDriverName("com.mysql.cj.jdbc.Driver")
                 //TODO  TODO  TODO  TODO
-                .setUrl("jdbc:mysql://127.0.0.1:3306/xdclass_coupon?useSSL=false&serverTimezone=GMT")
+                .setUrl("jdbc:mysql://39.105.31.194:3306/xdclass_coupon?useSSL=false&serverTimezone=GMT")
                 .setUsername("root")
-                .setPassword("Abcd1234");
+                .setPassword("jisheng.LI@423");
 
         //3. 策略配置globalConfiguration中
         StrategyConfig stConfig = new StrategyConfig();
@@ -67,7 +67,7 @@ public class MyBatisPlusGenerator {
 
                 // 生成的表, 支持多表一起生成，以数组形式填写
                 //TODO  TODO  TODO  TODO
-                .setInclude("coupon", "coupon_record");
+                .setInclude("coupon_task");
 
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
