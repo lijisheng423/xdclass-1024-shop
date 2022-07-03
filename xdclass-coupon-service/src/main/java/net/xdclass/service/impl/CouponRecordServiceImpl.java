@@ -3,6 +3,7 @@ package net.xdclass.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import net.xdclass.config.RabbitMQConfig;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.CouponStateEnum;
 import net.xdclass.enums.StockTaskStateEnum;
@@ -11,12 +12,14 @@ import net.xdclass.interceptor.LoginInterceptor;
 import net.xdclass.mapper.CouponRecordMapper;
 import net.xdclass.mapper.CouponTaskMapper;
 import net.xdclass.model.CouponRecordDO;
+import net.xdclass.model.CouponRecordMessage;
 import net.xdclass.model.CouponTaskDO;
 import net.xdclass.model.LoginUser;
 import net.xdclass.request.LockCouponRecordRequest;
 import net.xdclass.service.CouponRecordService;
 import net.xdclass.util.JsonData;
 import net.xdclass.vo.CouponRecordVO;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,12 @@ public class CouponRecordServiceImpl implements CouponRecordService {
 
     @Autowired
     private CouponTaskMapper couponTaskMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
     /**
      * 分页查询领券记录
@@ -101,7 +110,16 @@ public class CouponRecordServiceImpl implements CouponRecordService {
         log.info("新增优惠券记录task insertRows={}",insertRows);
 
         if (lockCouponRecordIds.size() == insertRows && insertRows == updateRoes){
-            //发送延迟消息 TODO
+            //发送延迟消息
+            for (CouponTaskDO couponTaskDO : couponTaskDOList) {
+                CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
+                couponRecordMessage.setOutTradeNo(orderOutTradeNo);
+                couponRecordMessage.setTaskId(couponTaskDO.getId());
+
+                rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(),rabbitMQConfig.getCouponReleaseDelayRoutingKey(),couponRecordMessage);
+                log.info("优惠券锁定消息发送成功:{}",couponRecordMessage.toString());
+
+            }
 
             return JsonData.buildSuccess();
         }else {
