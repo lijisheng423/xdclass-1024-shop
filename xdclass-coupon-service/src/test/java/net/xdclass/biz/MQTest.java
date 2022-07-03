@@ -3,6 +3,7 @@ package net.xdclass.biz;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.CouponApplication;
 import net.xdclass.config.RabbitMQConfig;
+import net.xdclass.model.CouponRecordMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -22,5 +23,14 @@ public class MQTest {
     public void sendDealyMsg(){
         rabbitTemplate.convertAndSend("coupon.event.exchange","coupon.release.delay.routing.key",
                 "this is coupon record lock message");
+    }
+
+    @Test
+    public void testCouponRecordRelease(){
+        CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
+        couponRecordMessage.setOutTradeNo("123456abc");
+        couponRecordMessage.setTaskId(1l);
+        rabbitTemplate.convertAndSend("coupon.event.exchange","coupon.release.delay.routing.key",
+                couponRecordMessage);
     }
 }
