@@ -63,7 +63,13 @@ public class CouponMQListener {
 //        finally {
 //            lock.unlock();
 //        }
-
-
     }
+
+
+//    @RabbitHandler
+//    public void releaseCouponRecord2(String msg, Message message, Channel channel) throws IOException {
+//        log.info(msg);
+//        channel.basicAck(message.getMessageProperties().getDeliveryTag(),true);
+//    }
+
 }
