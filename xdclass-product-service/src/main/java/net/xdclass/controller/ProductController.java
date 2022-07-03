@@ -4,6 +4,7 @@ package net.xdclass.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.xdclass.request.LockProductRequest;
 import net.xdclass.service.ProductService;
 import net.xdclass.util.JsonData;
 import net.xdclass.vo.ProductVO;
@@ -43,6 +44,15 @@ public class ProductController {
     public JsonData detail(@ApiParam(value = "商品id",required = true)  @PathVariable("product_id") long productId){
         ProductVO productVO = productService.findDetailById(productId);
         return JsonData.buildSuccess(productVO);
+    }
+
+
+    @ApiOperation("商品库存锁定")
+    @PostMapping("lock_products")
+    public JsonData lockProducts(@ApiParam("商品库存锁定") @RequestBody LockProductRequest lockProductRequest){
+
+        JsonData jsonData = productService.lockProductStock(lockProductRequest);
+        return JsonData.buildSuccess();
     }
 
 
