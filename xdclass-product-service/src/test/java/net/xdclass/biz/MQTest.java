@@ -3,6 +3,7 @@ package net.xdclass.biz;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.ProductApplication;
 import net.xdclass.model.CouponRecordMessage;
+import net.xdclass.model.ProductMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -24,12 +25,12 @@ public class MQTest {
                 "this is stock record lock message");
     }
 
-//    @Test
-//    public void testCouponRecordRelease(){
-//        CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
-//        couponRecordMessage.setOutTradeNo("123456abc");
-//        couponRecordMessage.setTaskId(1l);
-//        rabbitTemplate.convertAndSend("coupon.event.exchange","coupon.release.delay.routing.key",
-//                couponRecordMessage);
-//    }
+    @Test
+    public void testSendProductStockMessage(){
+        ProductMessage productMessage = new ProductMessage();
+        productMessage.setOutTradeNo("123456abc");
+        productMessage.setTaskId(1l);
+        rabbitTemplate.convertAndSend("stock.event.exchange","stock.release.delay.routing.key"
+                ,productMessage);
+    }
 }
