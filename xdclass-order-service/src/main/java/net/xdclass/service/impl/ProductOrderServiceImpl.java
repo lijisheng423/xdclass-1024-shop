@@ -1,12 +1,20 @@
 package net.xdclass.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import net.xdclass.enums.BizCodeEnum;
+import net.xdclass.exception.BizException;
+import net.xdclass.fegin.UserFeignService;
+import net.xdclass.interceptor.LoginInterceptor;
 import net.xdclass.mapper.ProductOrderMapper;
+import net.xdclass.model.LoginUser;
 import net.xdclass.model.ProductOrderDO;
 import net.xdclass.request.ConfirmOrderRequest;
 import net.xdclass.service.ProductOrderService;
+import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JsonData;
+import net.xdclass.vo.ProductOrderAddressVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +24,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
     @Autowired
     private ProductOrderMapper productOrderMapper;
+
+    @Autowired
+    private UserFeignService userFeignService;
 
     /**
      * 防重提交
@@ -44,7 +55,29 @@ public class ProductOrderServiceImpl implements ProductOrderService {
      */
     @Override
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String orderOutTradeNo = CommonUtil.getStringNumRandom(32);
+        ProductOrderAddressVO productOrderAddressVO = this.getUserAddress(confirmOrderRequest.getAddressId());
+        log.info("收货地址信息:{}",productOrderAddressVO);
+
+
         return null;
+    }
+
+    /**
+     * 获取收货地址详情
+     * @param addressId
+     * @return
+     */
+    private ProductOrderAddressVO getUserAddress(long addressId) {
+        JsonData addressData = userFeignService.detail(addressId);
+        if (addressData.getCode()!=0){
+            log.error("获取收货地址失败，msg:{}",addressData);
+            throw new BizException(BizCodeEnum.ADDRESS_NO_EXITS);
+        }
+
+        ProductOrderAddressVO productOrderAddressVO =  addressData.getData(new TypeReference<ProductOrderAddressVO>(){});
+        return productOrderAddressVO;
     }
 
     /**
