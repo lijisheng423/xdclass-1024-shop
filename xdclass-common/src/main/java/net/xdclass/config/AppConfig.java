@@ -1,5 +1,6 @@
 package net.xdclass.config;
 
+import feign.RequestInterceptor;
 import lombok.Data;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -11,6 +12,10 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Configuration
 @Data
@@ -48,5 +53,25 @@ public class AppConfig {
         redisTemplate.setKeySerializer(redisSerializer);
         redisTemplate.setValueSerializer(redisSerializer);
         return redisTemplate;
+    }
+
+    /**
+     * feign调用丢失token解决方式，新增拦截器
+     * @return
+     */
+    @Bean
+    public RequestInterceptor requestInterceptor(){
+        return requestTemplate -> {
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (null != requestAttributes){
+                HttpServletRequest request = requestAttributes.getRequest();
+                if (null == request){
+                    return;
+                }
+                String token = request.getHeader("token");
+                requestTemplate.header("token",token);
+            }
+        };
+
     }
 }

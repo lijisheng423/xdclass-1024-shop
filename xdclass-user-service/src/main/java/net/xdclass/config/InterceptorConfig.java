@@ -30,24 +30,4 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/api/user/*/send_code", "/api/user/*/captcha", "/api/user/*/register",
                         "/api/user/*/login", "/api/user/*/upload");
     }
-
-    /**
-     * feign调用丢失token解决方式，新增拦截器
-     * @return
-     */
-    @Bean
-    public RequestInterceptor requestInterceptor(){
-        return requestTemplate -> {
-            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (null != requestAttributes){
-                HttpServletRequest request = requestAttributes.getRequest();
-                if (null == request){
-                    return;
-                }
-                String token = request.getHeader("token");
-                requestTemplate.header("token",token);
-            }
-        };
-
-    }
 }

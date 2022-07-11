@@ -29,25 +29,4 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 //排除不拦截的路径
                 .excludePathPatterns("/api/callback/*/**","/api/order/*/query_state");
     }
-
-
-    /**
-     * feign调用丢失token解决方式，新增拦截器
-     * @return
-     */
-    @Bean
-    public RequestInterceptor requestInterceptor(){
-        return requestTemplate -> {
-            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            if (null != requestAttributes){
-                HttpServletRequest request = requestAttributes.getRequest();
-                if (null == request){
-                    return;
-                }
-                String token = request.getHeader("token");
-                requestTemplate.header("token",token);
-            }
-        };
-
-    }
 }
