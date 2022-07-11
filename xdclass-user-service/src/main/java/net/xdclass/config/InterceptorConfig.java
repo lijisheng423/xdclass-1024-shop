@@ -1,11 +1,16 @@
 package net.xdclass.config;
 
+import feign.RequestInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Configuration
 @Slf4j
@@ -24,5 +29,25 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 //排除不拦截的路径
                 .excludePathPatterns("/api/user/*/send_code", "/api/user/*/captcha", "/api/user/*/register",
                         "/api/user/*/login", "/api/user/*/upload");
+    }
+
+    /**
+     * feign调用丢失token解决方式，新增拦截器
+     * @return
+     */
+    @Bean
+    public RequestInterceptor requestInterceptor(){
+        return requestTemplate -> {
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (null != requestAttributes){
+                HttpServletRequest request = requestAttributes.getRequest();
+                if (null == request){
+                    return;
+                }
+                String token = request.getHeader("token");
+                requestTemplate.header("token",token);
+            }
+        };
+
     }
 }
