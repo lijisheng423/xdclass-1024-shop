@@ -6,9 +6,12 @@ import io.swagger.annotations.ApiParam;
 import net.xdclass.request.CartItemRequest;
 import net.xdclass.service.CartService;
 import net.xdclass.util.JsonData;
+import net.xdclass.vo.CartItemVO;
 import net.xdclass.vo.CartVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Api(tags = "购物车")
 @RestController
@@ -57,6 +60,20 @@ public class CartController {
     public JsonData changeItem(@ApiParam("购物项") @RequestBody CartItemRequest cartItemRequest){
         cartService.changeItemNum(cartItemRequest);
         return JsonData.buildSuccess();
+    }
+
+
+    /**
+     * 用户订单服务，确认订单，获取对应的商品项详情信息
+     * 会清空购物车的商品数量
+     * @param productIdList
+     * @return
+     */
+    @ApiOperation("获取对应订单的商品信息")
+    @PostMapping("confirm_order_cart_items")
+    public JsonData confirmOrderCartItems(@ApiParam("商品id列表") @RequestBody List<Long> productIdList){
+        List<CartItemVO> cartItemVOList =  cartService.confirmOrderCartItems(productIdList);
+        return JsonData.buildSuccess(cartItemVOList);
     }
 
 
