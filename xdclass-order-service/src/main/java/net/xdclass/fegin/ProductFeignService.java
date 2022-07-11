@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 @FeignClient(name = "xdclass-product-service")
-public interface ProductFeginService {
+public interface ProductFeignService {
 
     /**
      * 获取购物车的最新商品价格（也会清空对应的购物车商品）
