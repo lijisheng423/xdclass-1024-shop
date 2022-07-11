@@ -144,6 +144,7 @@ public class CartServiceImpl implements CartService {
         //根据需要的商品id进行过滤，并清空对应的购物项
         List<CartItemVO> resultList = cartItemVOList.stream().filter(obj -> {
             if (productIdList.contains(obj.getProductId())) {
+                //todo 通过mq来进行删除，其中task表中存储 out_trade_no,userId,productId,buyNum
                 this.deleteItem(obj.getProductId());
                 return true;
             }
