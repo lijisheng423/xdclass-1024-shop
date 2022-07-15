@@ -24,7 +24,7 @@ public class ProductOrderDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -70,7 +70,7 @@ public class ProductOrderDO implements Serializable {
     /**
      * 用户id
      */
-    private Integer userId;
+    private Long userId;
 
     /**
      * 0表示未删除，1表示已经删除
