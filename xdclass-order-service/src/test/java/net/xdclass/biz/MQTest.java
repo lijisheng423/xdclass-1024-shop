@@ -3,6 +3,7 @@ package net.xdclass.biz;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.OrderApplication;
 import net.xdclass.model.CouponRecordMessage;
+import net.xdclass.model.OrderMessage;
 import org.junit.Test;
 import org.junit.jupiter.api.Order;
 import org.junit.runner.RunWith;
@@ -25,12 +26,11 @@ public class MQTest {
                 "this is order close message");
     }
 
-//    @Test
-//    public void testCouponRecordRelease(){
-//        CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
-//        couponRecordMessage.setOutTradeNo("123456abc");
-//        couponRecordMessage.setTaskId(1l);
-//        rabbitTemplate.convertAndSend("coupon.event.exchange","coupon.release.delay.routing.key",
-//                couponRecordMessage);
-//    }
+    @Test
+    public void testOrderCloseMessage(){
+        OrderMessage orderMessage = new OrderMessage();
+        orderMessage.setOutTradeNo("123456ABC");
+        rabbitTemplate.convertAndSend("order.event.exchange","order.close.delay.routing.key",
+                orderMessage);
+    }
 }

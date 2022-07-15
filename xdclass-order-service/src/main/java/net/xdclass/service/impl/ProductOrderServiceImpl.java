@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.generator.config.IFileCreate;
 import lombok.extern.slf4j.Slf4j;
+import net.xdclass.config.RabbitMQConfig;
 import net.xdclass.enums.*;
 import net.xdclass.exception.BizException;
 import net.xdclass.fegin.CouponFeignService;
@@ -14,6 +15,7 @@ import net.xdclass.interceptor.LoginInterceptor;
 import net.xdclass.mapper.ProductOrderItemMapper;
 import net.xdclass.mapper.ProductOrderMapper;
 import net.xdclass.model.LoginUser;
+import net.xdclass.model.OrderMessage;
 import net.xdclass.model.ProductOrderDO;
 import net.xdclass.model.ProductOrderItemDO;
 import net.xdclass.request.ConfirmOrderRequest;
@@ -27,6 +29,8 @@ import net.xdclass.util.JsonData;
 import net.xdclass.vo.CouponRecordVO;
 import net.xdclass.vo.OrderItemVO;
 import net.xdclass.vo.ProductOrderAddressVO;
+import org.junit.jupiter.api.Order;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +58,12 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
     @Autowired
     private ProductOrderItemMapper productOrderItemMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
     /**
      * 防重提交
@@ -112,7 +122,10 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         //创建订单项
         this.saveProductOrderItems(orderOutTradeNo,productOrderDO.getId(),orderItemVOList);
 
-        //发送延迟消息，用于自动关单 todo
+        //发送延迟消息，用于自动关单
+        OrderMessage orderMessage = new OrderMessage();
+        orderMessage.setOutTradeNo(orderOutTradeNo);
+        rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(),rabbitMQConfig.getOrderCloseDelayRoutingKey(),orderMessage);
 
         //创建支付 todo
 
