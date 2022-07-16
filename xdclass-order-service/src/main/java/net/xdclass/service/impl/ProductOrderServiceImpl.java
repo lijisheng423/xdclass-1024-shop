@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.generator.config.IFileCreate;
 import lombok.extern.slf4j.Slf4j;
+import net.xdclass.component.PayFactory;
 import net.xdclass.config.RabbitMQConfig;
 import net.xdclass.enums.*;
 import net.xdclass.exception.BizException;
@@ -67,6 +68,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
     @Autowired
     private RabbitMQConfig rabbitMQConfig;
+
+    @Autowired
+    private PayFactory payFactory;
 
     /**
      * 防重提交
@@ -131,6 +135,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(),rabbitMQConfig.getOrderCloseDelayRoutingKey(),orderMessage);
 
         //创建支付 todo
+        //payFactory.pay(payInfo);
 
         return null;
     }
