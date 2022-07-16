@@ -29,7 +29,10 @@ import net.xdclass.util.JsonData;
 import net.xdclass.vo.CouponRecordVO;
 import net.xdclass.vo.OrderItemVO;
 import net.xdclass.vo.ProductOrderAddressVO;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Order;
+import org.mockito.internal.util.StringUtil;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -357,6 +360,47 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             return "";
         }else {
             return productOrderDO.getState();
+        }
+    }
+
+    /**
+     * 定时关单
+     * @param orderMessage
+     * @return
+     */
+    @Override
+    public boolean closeProductOrder(OrderMessage orderMessage) {
+        ProductOrderDO productOrderDO = productOrderMapper.selectOne(new QueryWrapper<ProductOrderDO>()
+                .eq("out_trade_no", orderMessage.getOutTradeNo()));
+
+        if (null == productOrderDO){
+            //订单不存在
+            log.warn("直接确认消息，订单不存在:{}",orderMessage);
+            return true;
+        }
+
+        if (productOrderDO.getState().equalsIgnoreCase(ProductOrderStateEnum.PAY.name())){
+            //已经支付
+            log.info("直接确认消息，订单已经支付:{}",orderMessage);
+            return true;
+        }
+
+        //向第三方支付查询订单是否真的支付 todo
+
+        String payResult = "";
+
+        //结果为空，则未支付成功，本地订单取消
+        if (StringUtils.isBlank(payResult)){
+            productOrderMapper.updateOrderPayState(productOrderDO.getOutTradeNo(),ProductOrderStateEnum.CANCEL.name(),
+                    ProductOrderStateEnum.NEW.name());
+            log.info("结果为空，则未支付成功，本地取消订单:{}",orderMessage);
+            return true;
+        }else {
+            //支付成功，主动的将订单状态改为已经支付，造成该原因的情况可能是支付通道回调有问题
+            log.warn("支付成功，主动的将订单状态改为已经支付，造成该原因的情况可能是支付通道回调有问题",orderMessage);
+            productOrderMapper.updateOrderPayState(productOrderDO.getOutTradeNo(),ProductOrderStateEnum.PAY.name(),
+                    ProductOrderStateEnum.NEW.name());
+            return true;
         }
     }
 }
