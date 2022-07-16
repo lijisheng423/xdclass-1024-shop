@@ -3,8 +3,10 @@ package net.xdclass.component;
 import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.config.AlipayConfig;
@@ -94,6 +96,25 @@ public class AlipayStrategy implements PayStrategy {
 
     @Override
     public String queryPaySuccess(PayInfoVO payInfoVO) {
-        return null;
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        HashMap<String,String> content = new HashMap<>();
+        //订单商户号，64位
+        content.put("out_trade_no",payInfoVO.getOutTradeNo());
+        request.setBizContent(JSON.toJSONString(content));
+        AlipayTradeQueryResponse queryResponse = null;
+        try {
+            queryResponse = AlipayConfig.getInstance().execute(request);
+            log.info("订单查询响应:{}",queryResponse.getBody());
+        } catch (AlipayApiException e) {
+            log.error("支付宝订单查询异常:{}",e.getMessage());
+        }
+
+        if (queryResponse.isSuccess()){
+            log.info("支付宝订单状态查询成功:{}",payInfoVO);
+            return queryResponse.getTradeStatus();
+        }else {
+            log.info("支付宝订单状态查询失败:{}",payInfoVO);
+            return "";
+        }
     }
 }
