@@ -4,7 +4,9 @@ package net.xdclass.controller;
 import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.alipay.api.response.AlipayTradeWapPayResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -121,12 +123,13 @@ public class ProductOrderController {
         // 该笔订单允许的最晚付款时间，逾期将关闭交易。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
         content.put("timeout_express", "5m");
 
-        AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
+        AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
+
         request.setBizContent(JSON.toJSONString(content));
         request.setNotifyUrl(payUrlConfig.getAlipayCallbackUrl());
         request.setReturnUrl(payUrlConfig.getAlipaySuccessReturnUrl());
 
-        AlipayTradeAppPayResponse alipayResponse = AlipayConfig.getInstance().pageExecute(request);
+        AlipayTradeWapPayResponse alipayResponse = AlipayConfig.getInstance().pageExecute(request);
         if(alipayResponse.isSuccess()){
             System.out.println("调用成功");
             String form = alipayResponse.getBody();
