@@ -31,9 +31,9 @@ public interface ProductOrderService {
 
     /**
      * 处理支付结果，回调通知
-     * @param name
+     * @param payType
      * @param paramsMap
      * @return
      */
-    JsonData handlerOrderCallbackMsg(String name, Map<String, String> paramsMap);
+    JsonData handlerOrderCallbackMsg(String payType, Map<String, String> paramsMap);
 }
