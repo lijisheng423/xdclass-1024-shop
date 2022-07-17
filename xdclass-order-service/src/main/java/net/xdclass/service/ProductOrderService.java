@@ -5,6 +5,8 @@ import net.xdclass.request.ConfirmOrderRequest;
 import net.xdclass.util.JsonData;
 import org.springframework.amqp.core.Message;
 
+import java.util.Map;
+
 public interface ProductOrderService {
     /**
      * 创建订单
@@ -26,4 +28,12 @@ public interface ProductOrderService {
      * @return
      */
     boolean closeProductOrder(OrderMessage message);
+
+    /**
+     * 处理支付结果，回调通知
+     * @param name
+     * @param paramsMap
+     * @return
+     */
+    JsonData handlerOrderCallbackMsg(String name, Map<String, String> paramsMap);
 }

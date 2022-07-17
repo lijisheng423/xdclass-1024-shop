@@ -42,6 +42,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -407,5 +408,17 @@ public class ProductOrderServiceImpl implements ProductOrderService {
                     ProductOrderStateEnum.NEW.name());
             return true;
         }
+    }
+
+    /**
+     * 支付通知结果，更新订单状态
+     * @param name
+     * @param paramsMap
+     * @return
+     */
+    @Override
+    public JsonData handlerOrderCallbackMsg(String name, Map<String, String> paramsMap) {
+
+        return null;
     }
 }
