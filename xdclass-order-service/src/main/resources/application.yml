@@ -59,8 +59,8 @@ mqconfig:
   order_close_delay_routing_key: order.close.delay.routing.key
   #消息过期，进入释放队列的key,进入死信队列的key
   order_close_routing_key: order.close.routing.key
-  #消息过期时间,毫秒,测试改为15秒
-  ttl: 15000
+  #消息过期时间,毫秒,测试改为15秒，测试改为5分钟
+  ttl: 300000
 
 
 #支付宝配置
