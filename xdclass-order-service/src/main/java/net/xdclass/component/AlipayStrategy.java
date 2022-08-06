@@ -48,7 +48,7 @@ public class AlipayStrategy implements PayStrategy {
         if (timeOut<1){
             throw new BizException(BizCodeEnum.PAY_ORDER_PAY_TIMEOUT);
         }
-        content.put("timeout_express", Double.valueOf(timeOut)+"m");
+        content.put("timeout_express", Double.valueOf(timeOut).intValue()+"m");
 
         String clientType = payInfoVO.getClientType();
         String form = "";

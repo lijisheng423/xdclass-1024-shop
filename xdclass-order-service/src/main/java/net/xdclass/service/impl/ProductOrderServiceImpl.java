@@ -333,7 +333,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
      * @return
      */
     private boolean couponAvailable(CouponRecordVO couponRecordVO) {
-        if (couponRecordVO.getUseState().equalsIgnoreCase(CouponStateEnum.USED.name())){
+        if (couponRecordVO.getUseState().equalsIgnoreCase(CouponStateEnum.NEW.name())){
             long currentTimestamp = CommonUtil.getCurrentTimestamp();
             long end = couponRecordVO.getEndTime().getTime();
             long start = couponRecordVO.getStartTime().getTime();

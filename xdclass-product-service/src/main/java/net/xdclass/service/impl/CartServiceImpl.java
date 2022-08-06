@@ -178,7 +178,7 @@ public class CartServiceImpl implements CartService {
             productIdList.add(cartItemVO.getProductId());
         }
         //查询最新的商品价格
-        if (latestPrice){
+        if (latestPrice && productIdList.size()>0){
             setProductLatestPrice(cartItemVOList,productIdList);
         }
 
