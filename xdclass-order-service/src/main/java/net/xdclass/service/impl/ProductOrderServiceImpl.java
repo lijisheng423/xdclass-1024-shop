@@ -203,7 +203,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         productOrderDO.setPayAmount(confirmOrderRequest.getRealPayAmount());
 
         //总价格，未使用优惠券的价格
-        productOrderDO.setPayAmount(confirmOrderRequest.getTotalAmount());
+        productOrderDO.setTotalAmount(confirmOrderRequest.getTotalAmount());
         productOrderDO.setState(ProductOrderStateEnum.NEW.name());
         productOrderDO.setPayType(ProductOrderPayTypeEnum.valueOf(confirmOrderRequest.getPayType()).name());
 
