@@ -13,9 +13,12 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.config.AlipayConfig;
 import net.xdclass.config.PayUrlConfig;
+import net.xdclass.constant.CacheKey;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.ClientType;
 import net.xdclass.enums.ProductOrderPayTypeEnum;
+import net.xdclass.interceptor.LoginInterceptor;
+import net.xdclass.model.LoginUser;
 import net.xdclass.request.ConfirmOrderRequest;
 import net.xdclass.request.RepayOrderRequest;
 import net.xdclass.service.ProductOrderService;
@@ -25,6 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.mockito.internal.util.StringUtil;
 import org.redisson.misc.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +37,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -52,6 +58,20 @@ public class ProductOrderController {
 
     @Autowired
     private PayUrlConfig payUrlConfig;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @ApiOperation("获取提交订单令牌")
+    @GetMapping("get_token")
+    public JsonData getOrderToken(){
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String key = String.format(CacheKey.SUBMIT_ORDER_TOKEN_KEY, loginUser.getId());
+        String token = CommonUtil.getStringNumRandom(32);
+        redisTemplate.opsForValue().set(key,token,30, TimeUnit.MINUTES);
+        return JsonData.buildSuccess(token);
+
+    }
 
     /**
      * 分页查询我的订单列表

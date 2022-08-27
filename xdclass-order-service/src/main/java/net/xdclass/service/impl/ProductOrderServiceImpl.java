@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.generator.config.IFileCreate;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.component.PayFactory;
 import net.xdclass.config.RabbitMQConfig;
+import net.xdclass.constant.CacheKey;
 import net.xdclass.constant.TimeConstant;
 import net.xdclass.enums.*;
 import net.xdclass.exception.BizException;
@@ -36,6 +37,9 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +75,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
     @Autowired
     private PayFactory payFactory;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
     /**
      * 防重提交
      *
@@ -100,6 +107,20 @@ public class ProductOrderServiceImpl implements ProductOrderService {
     @Transactional
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
+
+        String orderToken = confirmOrderRequest.getToken();
+        if (StringUtils.isBlank(orderToken)){
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_TOKEN_NOT_EXIST);
+        }
+        //原子操作，校验令牌，删除令牌
+        String script = "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
+        Long result = redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),
+                Arrays.asList(String.format(CacheKey.SUBMIT_ORDER_TOKEN_KEY, loginUser.getId())),
+                orderToken);
+        if (result==0L){
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_TOKEN_EQUAL_FAIL);
+        }
+
         String orderOutTradeNo = CommonUtil.getStringNumRandom(32);
         ProductOrderAddressVO productOrderAddressVO = this.getUserAddress(confirmOrderRequest.getAddressId());
         log.info("收货地址信息:{}",productOrderAddressVO);
