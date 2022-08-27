@@ -19,6 +19,7 @@ import net.xdclass.enums.ProductOrderPayTypeEnum;
 import net.xdclass.request.ConfirmOrderRequest;
 import net.xdclass.request.RepayOrderRequest;
 import net.xdclass.service.ProductOrderService;
+import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JsonData;
 import org.apache.commons.lang3.StringUtils;
 import org.mockito.internal.util.StringUtil;
@@ -107,6 +108,7 @@ public class ProductOrderController {
             }
         }else {
             log.error("创建订单失败：{}",jsonData.toString());
+            CommonUtil.sendJsonMessage(response,jsonData);
         }
     }
 
@@ -133,6 +135,7 @@ public class ProductOrderController {
             }
         }else {
             log.error("创建重新支付订单失败：{}",jsonData.toString());
+            CommonUtil.sendJsonMessage(response,jsonData);
         }
     }
 
