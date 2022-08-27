@@ -2,7 +2,9 @@ package net.xdclass.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.alipay.api.domain.PageInfo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.generator.config.IFileCreate;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.component.PayFactory;
@@ -28,23 +30,18 @@ import net.xdclass.service.ProductOrderItemService;
 import net.xdclass.service.ProductOrderService;
 import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JsonData;
-import net.xdclass.vo.CouponRecordVO;
-import net.xdclass.vo.OrderItemVO;
-import net.xdclass.vo.PayInfoVO;
-import net.xdclass.vo.ProductOrderAddressVO;
+import net.xdclass.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Order;
 import org.mockito.internal.util.StringUtil;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -445,5 +442,45 @@ public class ProductOrderServiceImpl implements ProductOrderService {
                 //微信支付 todo
         }
         return JsonData.buildResult(BizCodeEnum.PAY_ORDER_CALLBACK_NOT_SUCCESS);
+    }
+
+
+    /**
+     * 分页查询我的订单列表
+     * @param page
+     * @param size
+     * @param state
+     * @return
+     */
+    @Override
+    public Map<String, Object> page(int page, int size, String state) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        Page<ProductOrderDO> pageInfo = new Page<>(page,size);
+        Page<ProductOrderDO> orderDOPage = null;
+        if (StringUtils.isBlank(state)){
+            orderDOPage = productOrderMapper.selectPage(pageInfo, new QueryWrapper<ProductOrderDO>().eq("user_id", loginUser.getId()));
+        }else {
+            orderDOPage = productOrderMapper.selectPage(pageInfo, new QueryWrapper<ProductOrderDO>().eq("user_id", loginUser.getId()).eq("state",state));
+        }
+        List<ProductOrderDO> productOrderDOList = orderDOPage.getRecords();
+        List<ProductOrderVO> productOrderVOList = productOrderDOList.stream().map(obj->{
+            List<ProductOrderItemDO> productOrderItemDOList = productOrderItemMapper.selectList(new QueryWrapper<ProductOrderItemDO>().eq("out_trade_no", obj.getOutTradeNo()));
+            List<OrderItemVO> orderItemVOList = productOrderItemDOList.stream().map(item -> {
+                OrderItemVO orderItemVO = new OrderItemVO();
+                BeanUtils.copyProperties(item, orderItemVO);
+                return orderItemVO;
+            }).collect(Collectors.toList());
+
+            ProductOrderVO productOrderVO = new ProductOrderVO();
+            BeanUtils.copyProperties(obj,productOrderVO);
+            productOrderVO.setOrderItemVOList(orderItemVOList);
+            return productOrderVO;
+        }).collect(Collectors.toList());
+
+        Map<String,Object> pageMap = new HashMap<>(3);
+        pageMap.put("total_record",orderDOPage.getTotal());
+        pageMap.put("total_page",orderDOPage.getPages());
+        pageMap.put("current_data",productOrderVOList);
+        return pageMap;
     }
 }

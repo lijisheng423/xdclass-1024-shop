@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -49,6 +50,26 @@ public class ProductOrderController {
 
     @Autowired
     private PayUrlConfig payUrlConfig;
+
+    /**
+     * 分页查询我的订单列表
+     * @param page
+     * @param size
+     * @param state
+     * @return
+     */
+    @ApiOperation("分页查询我的订单列表")
+    @GetMapping("page")
+    public JsonData pageOrderList(@ApiParam(value = "当前页") @RequestParam(value = "page", defaultValue = "1") int page,
+                                  @ApiParam(value = "每页显示多少条") @RequestParam(value = "size", defaultValue = "2") int size,
+                                  @ApiParam(value = "订单状态") @RequestParam(value = "state", required = false) String state
+                                  ){
+
+        Map<String,Object> pageResult = productOrderService.page(page,size,state);
+        return JsonData.buildSuccess(pageResult);
+    }
+
+
 
     /**
      * 此接口没有登录拦截，可以增加一个秘钥进行rpc通信
