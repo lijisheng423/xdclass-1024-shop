@@ -22,16 +22,14 @@ import net.xdclass.model.LoginUser;
 import net.xdclass.model.OrderMessage;
 import net.xdclass.model.ProductOrderDO;
 import net.xdclass.model.ProductOrderItemDO;
-import net.xdclass.request.ConfirmOrderRequest;
-import net.xdclass.request.LockCouponRecordRequest;
-import net.xdclass.request.LockProductRequest;
-import net.xdclass.request.OrderItemRequest;
+import net.xdclass.request.*;
 import net.xdclass.service.ProductOrderItemService;
 import net.xdclass.service.ProductOrderService;
 import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JsonData;
 import net.xdclass.vo.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.junit.jupiter.api.Order;
 import org.mockito.internal.util.StringUtil;
 import org.springframework.amqp.core.Message;
@@ -39,6 +37,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -98,6 +97,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
      * @return
      */
     @Override
+    @Transactional
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String orderOutTradeNo = CommonUtil.getStringNumRandom(32);
@@ -482,5 +482,53 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         pageMap.put("total_page",orderDOPage.getPages());
         pageMap.put("current_data",productOrderVOList);
         return pageMap;
+    }
+
+    /**
+     * 二次支付
+     * @param repayOrderRequest
+     * @return
+     */
+    @Override
+    @Transactional
+    public JsonData repay(RepayOrderRequest repayOrderRequest) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        ProductOrderDO productOrderDO = productOrderMapper.selectOne(new QueryWrapper<ProductOrderDO>().eq("out_trade_no", repayOrderRequest.getOutTradeNo())
+                .eq("user_id", loginUser.getId()));
+        log.info("订单状态状态等信息:{}",productOrderDO);
+        if (productOrderDO==null){
+            return JsonData.buildResult(BizCodeEnum.ORDER_CONFIRM_NOT_EXIST);
+        }
+
+        if (!productOrderDO.getState().equalsIgnoreCase(ProductOrderStateEnum.NEW.name())){
+            //订单状态不是NEW
+            return JsonData.buildResult(BizCodeEnum.PAY_ORDER_STATE_ERROR);
+        }else {
+            //二次支付
+            //订单创建到现在的存活时间
+            long orderLiveTime =  CommonUtil.getCurrentTimestamp()-productOrderDO.getCreateTime().getTime();
+            //创建订单是临界点，所以再增加70s,假如29分也不能发起支付
+            orderLiveTime = orderLiveTime + 70*1000;
+            //大于订单超时时间，则失效
+            if (orderLiveTime>TimeConstant.ORDER_PAY_TIMEOUT_MILLS){
+                return JsonData.buildResult(BizCodeEnum.PAY_ORDER_PAY_TIMEOUT);
+            }else {
+                //记得更新DB订单支付参数，payType，还可以增加订单支付信息日志 todo
+
+                //剩余有效时间 = 总时间 - 剩下的有效时间
+                long timeout = TimeConstant.ORDER_PAY_TIMEOUT_MILLS-orderLiveTime;
+                PayInfoVO payInfoVO = new PayInfoVO(productOrderDO.getOutTradeNo(),productOrderDO.getPayAmount(),repayOrderRequest.getPayType(),
+                        repayOrderRequest.getClientType(),productOrderDO.getOutTradeNo(),"",timeout);
+                log.info("payInfoVO={}",payInfoVO);
+                String payResult = payFactory.pay(payInfoVO);
+                if (StringUtils.isNotBlank(payResult)){
+                    log.info("创建二次支付订单成功:payInfoVO={}，payResult={}",payInfoVO,payResult);
+                    return JsonData.buildSuccess(payResult);
+                }else {
+                    log.error("创建二次支付订单失败:payInfoVO={}，payResult={}",payInfoVO,payResult);
+                    return JsonData.buildResult(BizCodeEnum.PAY_ORDER_FAIL);
+                }
+            }
+        }
     }
 }

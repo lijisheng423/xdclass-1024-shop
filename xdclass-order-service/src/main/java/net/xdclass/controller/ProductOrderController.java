@@ -17,6 +17,7 @@ import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.ClientType;
 import net.xdclass.enums.ProductOrderPayTypeEnum;
 import net.xdclass.request.ConfirmOrderRequest;
+import net.xdclass.request.RepayOrderRequest;
 import net.xdclass.service.ProductOrderService;
 import net.xdclass.util.JsonData;
 import org.apache.commons.lang3.StringUtils;
@@ -106,6 +107,32 @@ public class ProductOrderController {
             }
         }else {
             log.error("创建订单失败：{}",jsonData.toString());
+        }
+    }
+
+    @ApiOperation("重新支付订单")
+    @PostMapping("repay")
+    private void  repay(@ApiParam("订单对象") @RequestBody RepayOrderRequest repayOrderRequest, HttpServletResponse response){
+
+        JsonData jsonData = productOrderService.repay(repayOrderRequest);
+
+        if (jsonData.getCode()==0){
+            String clientType = repayOrderRequest.getClientType();
+            String payType = repayOrderRequest.getPayType();
+            //支付宝网页支付，都是跳转网页，APP除外
+            if (payType.equalsIgnoreCase(ProductOrderPayTypeEnum.ALIPAY.name())){
+                log.info("创建重新支付订单成功:{}",repayOrderRequest.toString());
+                if (clientType.equalsIgnoreCase(ClientType.H5.name())){
+                    writeData(response,jsonData);
+                }else if (clientType.equalsIgnoreCase(ClientType.APP.name())){
+                    //APP SDK支付 todo
+                }
+
+            }else if (payType.equalsIgnoreCase(ProductOrderPayTypeEnum.WECHAT.name())){
+                //微信支付 todo
+            }
+        }else {
+            log.error("创建重新支付订单失败：{}",jsonData.toString());
         }
     }
 
