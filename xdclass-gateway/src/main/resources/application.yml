@@ -6,11 +6,6 @@ spring:
     name: xdclass-gateway-service
 
   cloud:
-    #注册中心地址
-    nacos:
-      discovery:
-        server-addr: 39.105.31.194:8848
-
     gateway:
       routes: #数组形式
         - id: product-service  #商品服务 路由唯一标识
@@ -57,4 +52,5 @@ spring:
 logging:
   level:
     root: INFO
+    com.alibaba.nacos.client.config.impl: WARN
 

@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: xdclass-gateway-service
+  cloud:
+    nacos:
+      config:
+        server-addr: 39.105.31.194:8848
+      discovery:
+        server-addr: 39.105.31.194:8848
