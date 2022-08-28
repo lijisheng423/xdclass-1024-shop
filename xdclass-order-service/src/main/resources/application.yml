@@ -71,4 +71,4 @@ alipay:
   success_return_url: https://xdclass.net
 
   #支付宝通知回调地址，蚂蚁金服开放平台应用后台也需要配置相应的地址
-  callback_url: https://4baesi3p33j8.ngrok.xiaomiqiu123.top/api/callback/order/v1/alipay
+  callback_url: https://4baesi3p33j8.ngrok.xiaomiqiu123.top/order-server/api/callback/order/v1/alipay
