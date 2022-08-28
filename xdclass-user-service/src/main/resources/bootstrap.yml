@@ -1,6 +1,6 @@
 spring:
   application:
-    name: xdclass-gateway-service
+    name: xdclass-user-service
   cloud:
     nacos:
       config:
