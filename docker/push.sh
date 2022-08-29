@@ -1,5 +1,5 @@
 #登录阿里云镜像仓
-docker docker login --username=lijisheng423 registry.cn-beijing.aliyuncs.com --password=Lijisheng423
+docker login --username=lijisheng423 registry.cn-beijing.aliyuncs.com --password=Abcd1234
 
 
 #构建整个项目，或者单独构建common项目,避免依赖未被构建上去
