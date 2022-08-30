@@ -16,7 +16,7 @@
 #    host: 39.105.31.194
 #    port: 5672
 #    virtual-host: /
-#    password: password
+#    password: xdclass.net168
 #    username: admin
 #    #开启手动确认消息
 #    listener:
@@ -28,7 +28,7 @@
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://39.105.31.194:3306/xdclass_coupon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
 #    username: root
-#    password: jisheng.LI@423
+#    password: xdclass.net168
 #    hikari:
 #      max-lifetime: 500000
 #  #redis配置
