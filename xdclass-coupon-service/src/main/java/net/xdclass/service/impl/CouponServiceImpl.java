@@ -72,7 +72,8 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public JsonData addCoupon(long couponId, CouponCategoryEnum categoryEnum) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        String lockKey = "lock:coupon:" + couponId;
+        //锁粒度，锁用户防止超领
+        String lockKey = "lock:coupon:" + couponId+":"+loginUser.getId();
         RLock rLock = redissonClient.getLock(lockKey);
         //多个线程进入会阻塞等待释放锁，默认30s，有watch dog自动续期
         rLock.lock();

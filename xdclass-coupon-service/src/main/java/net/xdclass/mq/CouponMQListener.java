@@ -37,15 +37,14 @@ public class CouponMQListener {
      */
     @RabbitHandler
     public void releaseCouponRecord(CouponRecordMessage couponRecordMessage, Message message, Channel channel) throws IOException {
+        //防止同个解锁任务并发进入;如果是串行消费，则无需加锁；加锁有利也有弊，看项目业务逻辑而定
+//        RLock lock = redissonClient.getLock("lock:coupon_record_release:" + couponRecordMessage.getTaskId());
+//        lock.lock();
 
         log.info("监听到消息: releaseCouponRecord消息内容:{}",couponRecordMessage);
         long msgTag = message.getMessageProperties().getDeliveryTag();
 
         boolean flag = couponRecordService.releaseCouponRecord(couponRecordMessage);
-
-        //防止同个解锁任务并发进入;如果是串行消费，则无需加锁；加锁有利也有弊，看项目业务逻辑而定
-//        RLock lock = redissonClient.getLock("lock:coupon_record_release:" + couponRecordMessage.getTaskId());
-//        lock.lock();
 
         try {
             if (flag){
