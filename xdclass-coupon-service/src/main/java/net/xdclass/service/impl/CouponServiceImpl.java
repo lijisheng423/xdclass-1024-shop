@@ -23,6 +23,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,7 @@ public class CouponServiceImpl implements CouponService {
     private RedissonClient redissonClient;
 
     @Override
+    @Cacheable(value = {"coupon"},key = "#root.methodName + #page+'_'+#size")
     public Map<String, Object> pageCouponActivity(int page, int size) {
         Page<CouponDO> pageInfo = new Page<>(page,size);
         Page<CouponDO> couponDOPage = couponMapper.selectPage(pageInfo, new QueryWrapper<CouponDO>()
