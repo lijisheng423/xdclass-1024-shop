@@ -73,10 +73,10 @@ public class CouponServiceImpl implements CouponService {
     public JsonData addCoupon(long couponId, CouponCategoryEnum categoryEnum) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         //锁粒度，锁用户防止超领
-        String lockKey = "lock:coupon:" + couponId+":"+loginUser.getId();
-        RLock rLock = redissonClient.getLock(lockKey);
-        //多个线程进入会阻塞等待释放锁，默认30s，有watch dog自动续期
-        rLock.lock();
+//        String lockKey = "lock:coupon:" + couponId+":"+loginUser.getId();
+//        RLock rLock = redissonClient.getLock(lockKey);
+//        //多个线程进入会阻塞等待释放锁，默认30s，有watch dog自动续期
+//        rLock.lock();
         //加锁10s之后过期，没有watch dog功能
         //rLock.lock(10,TimeUnit.SECONDS);
 
@@ -86,7 +86,7 @@ public class CouponServiceImpl implements CouponService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }*/
-        try {
+        //try {
             CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
                     .eq("id", couponId)
                     .eq("category", categoryEnum.name()));
@@ -118,10 +118,12 @@ public class CouponServiceImpl implements CouponService {
                 log.warn("发放优惠券失败：{}，用户：{}", couponDO, loginUser);
                 throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
             }
-        } finally {
-            rLock.unlock();
-            log.info("解锁成功:{}"+Thread.currentThread().getId());
-        }
+//        } finally {
+//            rLock.unlock();
+//            log.info("解锁成功:{}"+Thread.currentThread().getId());
+//        }
+
+        //布式锁放在事务内部，并不能解决超领问题，锁释放后，事务没有及时的提交，还是会超领
         return JsonData.buildSuccess();
     }
 
@@ -145,7 +147,16 @@ public class CouponServiceImpl implements CouponService {
                 .eq("category", CouponCategoryEnum.NEW_USER.name()));
         for (CouponDO couponDO : couponDOList) {
             //幂等操作，调用需要加锁
-            addCoupon(couponDO.getId(),CouponCategoryEnum.NEW_USER);
+            String lockKey = "lock:coupon:" + couponDO.getId()+":"+loginUser.getId();
+            RLock rLock = redissonClient.getLock(lockKey);
+            //多个线程进入会阻塞等待释放锁，默认30s，有watch dog自动续期
+            rLock.lock();
+            try {
+                addCoupon(couponDO.getId(),CouponCategoryEnum.NEW_USER);
+            }finally {
+                rLock.unlock();
+                log.info("解锁成功:{}"+Thread.currentThread().getId());
+            }
         }
         //int b = 1/0;
         return JsonData.buildSuccess();

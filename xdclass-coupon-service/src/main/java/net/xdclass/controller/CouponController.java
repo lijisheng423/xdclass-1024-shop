@@ -6,9 +6,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.enums.CouponCategoryEnum;
+import net.xdclass.interceptor.LoginInterceptor;
+import net.xdclass.model.LoginUser;
 import net.xdclass.request.NewUserCouponRequest;
 import net.xdclass.service.CouponService;
 import net.xdclass.util.JsonData;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +35,9 @@ public class CouponController {
     @Autowired
     private CouponService couponService;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
 
     @ApiOperation("分页查询优惠券")
     @GetMapping("page_coupon")
@@ -45,8 +52,19 @@ public class CouponController {
     @ApiOperation("领取优惠券")
     @GetMapping("add/promotion/{coupon_id}")
     public JsonData addPromotionCoupon(@ApiParam(value = "优惠券ID",required = true) @PathVariable("coupon_id") long couponId){
-        JsonData jsonData = couponService.addCoupon(couponId, CouponCategoryEnum.PROMOTION);
-        return JsonData.buildSuccess();
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String lockKey = "lock:coupon:" + couponId+":"+loginUser.getId();
+        RLock rLock = redissonClient.getLock(lockKey);
+        //多个线程进入会阻塞等待释放锁，默认30s，有watch dog自动续期
+        rLock.lock();
+        try {
+            JsonData jsonData = couponService.addCoupon(couponId, CouponCategoryEnum.PROMOTION);
+            return jsonData;
+        }
+        finally {
+            rLock.unlock();
+            log.info("解锁成功:{}"+Thread.currentThread().getId());
+        }
     }
 
 
